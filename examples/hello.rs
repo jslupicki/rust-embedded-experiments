@@ -7,6 +7,8 @@ extern crate panic_halt;
 
 use cortex_m_rt::entry;
 use cortex_m_semihosting::{debug, hprintln};
+#[allow(unused_imports)]
+use stm32f1xx_hal::prelude::*;
 
 #[entry]
 fn main() -> ! {
@@ -14,7 +16,7 @@ fn main() -> ! {
 
     // exit QEMU
     // NOTE do not run this on hardware; it can corrupt OpenOCD state
-    debug::exit(debug::EXIT_SUCCESS);
+    //debug::exit(debug::EXIT_SUCCESS);
 
     loop {}
 }

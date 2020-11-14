@@ -84,6 +84,8 @@ extern crate panic_halt;
 use core::ptr;
 
 use cortex_m_rt::entry;
+#[allow(unused_imports)]
+use stm32f1xx_hal::prelude::*;
 
 #[entry]
 fn main() -> ! {

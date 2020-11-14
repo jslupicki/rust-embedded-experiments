@@ -16,6 +16,8 @@ use cortex_m::peripheral::syst::SystClkSource;
 use cortex_m::Peripherals;
 use cortex_m_rt::{entry, exception};
 use cortex_m_semihosting::hprint;
+#[allow(unused_imports)]
+use stm32f1xx_hal::prelude::*;
 
 #[entry]
 fn main() -> ! {

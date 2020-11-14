@@ -30,6 +30,8 @@ extern crate panic_halt; // you can put a breakpoint on `rust_begin_unwind` to c
 
 use cortex_m::asm;
 use cortex_m_rt::entry;
+#[allow(unused_imports)]
+use stm32f1xx_hal::prelude::*;
 
 #[cfg(not(test))]
 #[entry]

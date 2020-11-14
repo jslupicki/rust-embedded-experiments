@@ -9,7 +9,6 @@
 //!
 //! ---
 
-#![feature(alloc)]
 #![feature(alloc_error_handler)]
 #![no_main]
 #![no_std]
@@ -24,6 +23,8 @@ use alloc_cortex_m::CortexMHeap;
 use cortex_m::asm;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
+#[allow(unused_imports)]
+use stm32f1xx_hal::prelude::*;
 
 // this is the allocator the application will use
 #[global_allocator]
@@ -43,7 +44,7 @@ fn main() -> ! {
 
     // exit QEMU
     // NOTE do not run this on hardware; it can corrupt OpenOCD state
-    debug::exit(debug::EXIT_SUCCESS);
+    //debug::exit(debug::EXIT_SUCCESS);
 
     loop {}
 }

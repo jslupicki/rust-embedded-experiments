@@ -31,7 +31,9 @@ extern crate panic_halt;
 use cortex_m::peripheral::syst::SystClkSource;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprint;
-use stm32f3::stm32f303::{interrupt, Interrupt, NVIC};
+use stm32f1::stm32f103::{interrupt, Interrupt, NVIC};
+#[allow(unused_imports)]
+use stm32f1xx_hal::prelude::*;
 
 #[entry]
 fn main() -> ! {
