@@ -1,135 +1,97 @@
-# `cortex-m-quickstart`
+# STM32F103 Bluepill RTIC Blink example
 
-> A template for building applications for ARM Cortex-M microcontrollers
+Working example of simple LED blinking application for popular Bluepill boards based on the STM32F103C8 chip. Example uses schedule API and peripherials access. You will need `stlink v2` tool or other programmer to flash the board.
 
-This project is developed and maintained by the [Cortex-M team][team].
+## How-to
 
-## Dependencies
+### Terminal workflow
 
-To build embedded programs using this template you'll need:
+Rust embedded relies heavily on `terminal workflow`, you will enter commands in the terminal. This can be strange at first, but this enables usage of great things like continious integration tools.
 
-- Rust 1.31, 1.30-beta, nightly-2018-09-13 or a newer toolchain. e.g. `rustup
-  default beta`
+For Mac OS X consider using `iTerm2` instead of Terminal application.
+For Windows consider using `powershell` (win + r -> powershell -> enter -> cd C:\examples\rtic_v5\bluepill_blinky)
 
-- The `cargo generate` subcommand. [Installation
-  instructions](https://github.com/ashleygwilliams/cargo-generate#installation).
+### Build
 
-- `rust-std` components (pre-compiled `core` crate) for the ARM Cortex-M
-  targets. Run:
+Run `cargo build` to compile the code. If you run it for the first time, it will take some time to download and compile dependencies. After that, you will see comething like:
 
-``` console
-$ rustup target add thumbv6m-none-eabi thumbv7m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf
+```bash
+>cargo build
+Finished dev [optimized + debuginfo] target(s) in 0.10s
 ```
 
-## Using this template
+If you see warnings, feel free to ask for help in chat or issues of this repo.
 
-**NOTE**: This is the very short version that only covers building programs. For
-the long version, which additionally covers flashing, running and debugging
-programs, check [the embedded Rust book][book].
+### Connect the board
 
-[book]: https://rust-embedded.github.io/book
+You need to connect you bluepill board to ST-Link and connect pins:
 
-0. Before we begin you need to identify some characteristics of the target
-  device as these will be used to configure the project:
+| BOARD |    | ST-LINK |
+|-------|----|---------|
+| GND   | -> | GND     |
+| 3.3V  | -> | 3.3V    |
+| SWCLK | -> | SWCLK   |
+| SWDIO | -> | SWDIO   |
 
-- The ARM core. e.g. Cortex-M3.
+Plug in ST-Link to USB port and wait it to initialize.
 
-- Does the ARM core include an FPU? Cortex-M4**F** and Cortex-M7**F** cores do.
+### Upload
 
-- How much Flash memory and RAM does the target device has? e.g. 256 KiB of
-  Flash and 32 KiB of RAM.
+We will use openocd to upload the code wit simple one-line one-command script:
 
-- Where are Flash memory and RAM mapped in the address space? e.g. RAM is
-  commonly located at address `0x2000_0000`.
-
-You can find this information in the data sheet or the reference manual of your
-device.
-
-In this example we'll be using the STM32F3DISCOVERY. This board contains an
-STM32F303VCT6 microcontroller. This microcontroller has:
-
-- A Cortex-M4F core that includes a single precision FPU
-
-- 256 KiB of Flash located at address 0x0800_0000.
-
-- 40 KiB of RAM located at address 0x2000_0000. (There's another RAM region but
-  for simplicity we'll ignore it).
-
-1. Instantiate the template.
-
-``` console
-$ cargo generate --git https://github.com/rust-embedded/cortex-m-quickstart
- Project Name: app
- Creating project called `app`...
- Done! New project created /tmp/app
-
-$ cd app
+```bash
+openocd -f openocd.cfg -c "program target/thumbv7m-none-eabi/debug/app verify reset exit"
 ```
 
-2. Set a default compilation target. There are four options as mentioned at the
-   bottom of `.cargo/config`. For the STM32F303VCT6, which has a Cortex-M4F
-   core, we'll pick the `thumbv7em-none-eabihf` target.
+You will see something like:
 
-``` console
-$ tail -n6 .cargo/config
+```bash
+openocd -f openocd.cfg -c "program target/thumbv7m-none-eabi/debug/app verify reset exit"
+Open On-Chip Debugger 0.10.0
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+Info : auto-selecting first available session transport "hla_swd". To override use 'transport select <transport>'.
+Info : The selected transport took over low-level target control. The results might differ compared to plain JTAG/SWD
+adapter speed: 1000 kHz
+adapter_nsrst_delay: 100
+none separate
+Info : Unable to match requested speed 1000 kHz, using 950 kHz
+Info : Unable to match requested speed 1000 kHz, using 950 kHz
+Info : clock speed 950 kHz
+Info : STLINK v2 JTAG v33 API v2 SWIM v7 VID 0x0483 PID 0x3748
+Info : using stlink api v2
+Info : Target voltage: 3.196863
+Info : stm32f1x.cpu: hardware has 6 breakpoints, 4 watchpoints
+target halted due to debug-request, current mode: Thread
+xPSR: 0x01000000 pc: 0x080033b4 msp: 0x20005000
+** Programming Started **
+auto erase enabled
+Info : device id = 0x20036410
+Info : flash size = 64kbytes
+target halted due to breakpoint, current mode: Thread
+xPSR: 0x61000000 pc: 0x2000003a msp: 0x20005000
+wrote 19456 bytes from file target/thumbv7m-none-eabi/debug/app in 1.118153s (16.992 KiB/s)
+** Programming Finished **
+** Verify Started **
+target halted due to breakpoint, current mode: Thread
+xPSR: 0x61000000 pc: 0x2000002e msp: 0x20005000
+verified 18588 bytes in 0.288441s (62.933 KiB/s)
+** Verified OK **
+** Resetting Target **
+shutdown command invoked
 ```
 
-``` toml
-[build]
-# Pick ONE of these compilation targets
-# target = "thumbv6m-none-eabi"    # Cortex-M0 and Cortex-M0+
-# target = "thumbv7m-none-eabi"    # Cortex-M3
-# target = "thumbv7em-none-eabi"   # Cortex-M4 and Cortex-M7 (no FPU)
-target = "thumbv7em-none-eabihf" # Cortex-M4F and Cortex-M7F (with FPU)
+## Troubleshooting
+
+If you are lucky and have new version of OpenOCD, you will need to change `openocd.cfg` file. Openocd will report error during the upload process, so you will just need to change line:
+
+```txt
+source [find interface/stlink-v2.cfg]
 ```
 
-3. Enter the memory region information into the `memory.x` file.
+to
 
-``` console
-$ cat memory.x
-/* Linker script for the STM32F303VCT6 */
-MEMORY
-{
-  /* NOTE 1 K = 1 KiBi = 1024 bytes */
-  FLASH : ORIGIN = 0x08000000, LENGTH = 256K
-  RAM : ORIGIN = 0x20000000, LENGTH = 40K
-}
+```txt
+source [find interface/stlink.cfg]
 ```
-
-4. Build the template application or one of the examples.
-
-``` console
-$ cargo build
-```
-
-## VS Code
-
-This template includes launch configurations for debugging CortexM programs with Visual Studio Code located in the `.vscode/` directory.  
-See [.vscode/README.md](./.vscode/README.md) for more information.  
-If you're not using VS Code, you can safely delete the directory from the generated project.
-
-# License
-
-This template is licensed under either of
-
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or
-  http://www.apache.org/licenses/LICENSE-2.0)
-
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
-
-at your option.
-
-## Contribution
-
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
-dual licensed as above, without any additional terms or conditions.
-
-## Code of Conduct
-
-Contribution to this crate is organized under the terms of the [Rust Code of
-Conduct][CoC], the maintainer of this crate, the [Cortex-M team][team], promises
-to intervene to uphold that code of conduct.
-
-[CoC]: https://www.rust-lang.org/policies/code-of-conduct
-[team]: https://github.com/rust-embedded/wg#the-cortex-m-team
