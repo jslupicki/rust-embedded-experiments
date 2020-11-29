@@ -3,6 +3,9 @@
 #![no_main]
 #![no_std]
 
+mod semihosting;
+mod togle;
+
 use panic_semihosting as _; 
 /*
 // dev profile: easier to debug panics; can put a breakpoint on `rust_begin_unwind`
@@ -19,24 +22,10 @@ use rtic::cyccnt::U32Ext;
 use stm32f1xx_hal::gpio::{gpioc::PC13, gpioa::PA5, Output, PushPull, State};
 use stm32f1xx_hal::prelude::*;
 #[cfg(feature = "semihosting")]
-use cortex_m_semihosting::hprintln;
+use semihosting::*;
+use togle::*;
 
 const PERIOD: u32 = 10_000_000;
-
-macro_rules! sprintln {
-    () => {
-        #[cfg(feature = "semihosting")]
-        hprintln!().unwrap();
-    };
-    ($s:expr) => {
-        #[cfg(feature = "semihosting")]
-        hprintln!($s).unwrap();
-    };
-    ($s:expr, $($tt:tt)*) => {
-        #[cfg(feature = "semihosting")]
-        hprintln!($s, $($tt)*).unwrap();
-  };
-}
 
 // We need to pass monotonic = rtic::cyccnt::CYCCNT to use schedule feature fo RTIC
 #[app(device = stm32f1xx_hal::pac, peripherals = true, monotonic = rtic::cyccnt::CYCCNT)]
@@ -99,7 +88,7 @@ const APP: () = {
             cx.resources.led_n.set_low().unwrap();
             sprintln!("Led OFF");
         }
-        *cx.resources.led_state ^= true;
+        cx.resources.led_state.togle();
         cx.schedule.blinker(cx.scheduled + PERIOD.cycles()).unwrap();
     }
 
