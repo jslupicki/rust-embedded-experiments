@@ -46,6 +46,7 @@ const APP: () = {
     struct Resources {
         led: PC13<Output<PushPull>>,
         led_n: PA5<Output<PushPull>>,
+        led_state: bool,
     }
 
     #[init(schedule = [blinker])]
@@ -84,25 +85,21 @@ const APP: () = {
         // Schedule the blinking task
         cx.schedule.blinker(cx.start + PERIOD.cycles()).unwrap();
 
-        init::LateResources { led: led, led_n: led_n }
+        init::LateResources { led: led, led_n: led_n, led_state: false}
     }
 
-    #[task(resources = [led, led_n], schedule = [blinker])]
+    #[task(resources = [led, led_n, led_state], schedule = [blinker])]
     fn blinker(cx: blinker::Context) {
-        // Use the safe local `static mut` of RTIC
-        static mut LED_STATE: bool = false;
-
-        if *LED_STATE {
+        if *cx.resources.led_state {
             cx.resources.led.set_high().unwrap();
             cx.resources.led_n.set_high().unwrap();
             sprintln!("Led ON");
-            *LED_STATE = false;
         } else {
             cx.resources.led.set_low().unwrap();
             cx.resources.led_n.set_low().unwrap();
             sprintln!("Led OFF");
-            *LED_STATE = true;
         }
+        *cx.resources.led_state ^= true;
         cx.schedule.blinker(cx.scheduled + PERIOD.cycles()).unwrap();
     }
 
