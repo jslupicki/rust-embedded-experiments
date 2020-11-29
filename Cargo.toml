@@ -1,8 +1,8 @@
 [package]
 name = "app"
 categories = ["embedded", "no-std"]
-authors = ["arrowcircle", "Emil Fresk <emil.fresk@gmail.com>"]
-description = "Example blinky for BluePill"
+authors = ["Jan Slupicki <jan@slupicki.com>"]
+description = "Embedded experiments"
 keywords = ["arm", "cortex-m"]
 license = "MIT OR Apache-2.0"
 version = "0.1.0"
