@@ -23,6 +23,21 @@ use cortex_m_semihosting::hprintln;
 
 const PERIOD: u32 = 10_000_000;
 
+macro_rules! sprintln {
+    () => {
+        #[cfg(feature = "semihosting")]
+        hprintln!().unwrap();
+    };
+    ($s:expr) => {
+        #[cfg(feature = "semihosting")]
+        hprintln!($s).unwrap();
+    };
+    ($s:expr, $($tt:tt)*) => {
+        #[cfg(feature = "semihosting")]
+        hprintln!($s, $($tt)*).unwrap();
+  };
+}
+
 // We need to pass monotonic = rtic::cyccnt::CYCCNT to use schedule feature fo RTIC
 #[app(device = stm32f1xx_hal::pac, peripherals = true, monotonic = rtic::cyccnt::CYCCNT)]
 const APP: () = {
@@ -80,14 +95,12 @@ const APP: () = {
         if *LED_STATE {
             cx.resources.led.set_high().unwrap();
             cx.resources.led_n.set_high().unwrap();
-            #[cfg(feature = "semihosting")]
-            hprintln!("Led ON").unwrap();
+            sprintln!("Led ON");
             *LED_STATE = false;
         } else {
             cx.resources.led.set_low().unwrap();
             cx.resources.led_n.set_low().unwrap();
-            #[cfg(feature = "semihosting")]
-            hprintln!("Led OFF").unwrap();
+            sprintln!("Led OFF");
             *LED_STATE = true;
         }
         cx.schedule.blinker(cx.scheduled + PERIOD.cycles()).unwrap();
