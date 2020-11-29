@@ -18,6 +18,8 @@ use rtic::app;
 use rtic::cyccnt::U32Ext;
 use stm32f1xx_hal::gpio::{gpioc::PC13, gpioa::PA5, Output, PushPull, State};
 use stm32f1xx_hal::prelude::*;
+#[cfg(feature = "semihosting")]
+use cortex_m_semihosting::hprintln;
 
 const PERIOD: u32 = 10_000_000;
 
@@ -33,6 +35,7 @@ const APP: () = {
 
     #[init(schedule = [blinker])]
     fn init(cx: init::Context) -> init::LateResources {
+
         // Enable cycle counter
         let mut core = cx.core;
         core.DWT.enable_cycle_counter();
@@ -77,10 +80,14 @@ const APP: () = {
         if *LED_STATE {
             cx.resources.led.set_high().unwrap();
             cx.resources.led_n.set_high().unwrap();
+            #[cfg(feature = "semihosting")]
+            hprintln!("Led ON").unwrap();
             *LED_STATE = false;
         } else {
             cx.resources.led.set_low().unwrap();
             cx.resources.led_n.set_low().unwrap();
+            #[cfg(feature = "semihosting")]
+            hprintln!("Led OFF").unwrap();
             *LED_STATE = true;
         }
         cx.schedule.blinker(cx.scheduled + PERIOD.cycles()).unwrap();
