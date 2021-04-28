@@ -1,0 +1,22 @@
+{
+    "cSpell.words": [
+        "EXTI",
+        "afio",
+        "cfgr",
+        "cyccnt",
+        "gpio",
+        "gpioa",
+        "gpioc",
+        "heprint",
+        "heprintln",
+        "hprint",
+        "hprintln",
+        "pclk",
+        "rtic",
+        "semihosting",
+        "seprint",
+        "seprintln",
+        "sprintln",
+        "sysclk"
+    ]
+}

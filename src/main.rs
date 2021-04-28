@@ -4,7 +4,7 @@
 #![no_std]
 
 mod semihosting;
-mod togle;
+mod toggle;
 
 use panic_semihosting as _; 
 /*
@@ -23,7 +23,7 @@ use stm32f1xx_hal::gpio::{gpioc::PC13, gpioa::PA5, Output, PushPull, State};
 use stm32f1xx_hal::prelude::*;
 #[cfg(feature = "semihosting")]
 use semihosting::*;
-use togle::*;
+use toggle::*;
 
 const PERIOD: u32 = 10_000_000;
 
@@ -74,7 +74,7 @@ const APP: () = {
         // Schedule the blinking task
         cx.schedule.blinker(cx.start + PERIOD.cycles()).unwrap();
 
-        init::LateResources { led: led, led_n: led_n, led_state: false}
+        init::LateResources { led, led_n, led_state: false}
     }
 
     #[task(resources = [led, led_n, led_state], schedule = [blinker])]
@@ -88,7 +88,7 @@ const APP: () = {
             cx.resources.led_n.set_low().unwrap();
             sprintln!("Led OFF");
         }
-        cx.resources.led_state.togle();
+        cx.resources.led_state.toggle();
         cx.schedule.blinker(cx.scheduled + PERIOD.cycles()).unwrap();
     }
 

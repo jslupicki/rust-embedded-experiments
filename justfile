@@ -1,6 +1,10 @@
 target := "thumbv7m-none-eabi"
 gdb := "arm-none-eabi-gdb"
 
+setup-env:
+    rustup default nightly
+    rustup target add {{target}}
+
 build:
     cargo build
 
